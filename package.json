@@ -1,14 +1,27 @@
 {
   "name": "practice",
   "version": "1.0.0",
-  "description": "node-practice",
+  "description": "node_practice",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "babel-node server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickvhite/node-practice.git"
   },
   "author": "Nikolay Natorin",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nickvhite/node-practice/issues"
+  },
+  "homepage": "https://github.com/nickvhite/node-practice#readme",
   "dependencies": {
-    "express": "^4.16.2"
+    "babel": "^5.8.38",
+    "express": "^4.16.2",
+    "http": "0.0.0",
+    "mongoose": "^5.0.0",
+    "socket.io": "^2.0.4"
   }
 }
