@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import '../models/user';
+import bcrypt from 'bcrypt'
 
 const User = mongoose.model('User');
 
