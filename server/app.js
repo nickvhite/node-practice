@@ -74,3 +74,14 @@ app.delete('/user', (req, res, next) => {
 });
 
 module.exports = app;
+
+// var data = JSON.stringify({username: 'test1', password: 'test1'})
+// var xmlHttp = new XMLHttpRequest();
+// xmlHttp.open("POST", "/login", false); // false for synchronous request
+// xmlHttp.setRequestHeader("Content-type", "application/json");
+// xmlHttp.send(data);
+
+// var data = JSON.stringify({username: 'test1', password: 'test1'})
+// var xmlHttp = new XMLHttpRequest();
+// xmlHttp.open("POST", "/logout", false); // false for synchronous request
+// xmlHttp.send();
