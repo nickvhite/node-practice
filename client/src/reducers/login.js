@@ -22,10 +22,12 @@ export default function login(state = initialState, action) {
     }
     if ( action.type === 'LOGIN_ERROR') {
         state.login_error = action.payload;
+        state = Object.assign({}, state);
         return state;
     }
     if ( action.type === 'PASSWORD_ERROR') {
         state.password_error = action.payload;
+        state = Object.assign({}, state);
         return state;
     }
 	return state;
