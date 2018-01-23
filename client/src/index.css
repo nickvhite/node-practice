@@ -1,0 +1,164 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+.start_form {
+  width: 150px;
+  margin: 250px auto 0;
+  padding: 10px 50px 20px;
+  background: #fff;
+  border-radius: 5px;
+  border: 3px solid black;
+  box-shadow: 5px -5px 20px 0 rgba(0, 0, 0, 0.5);
+}
+.start_form .calendar_logo {
+  position: absolute;
+  margin-top: -180px;
+  margin-left: 34px;
+  width: 80px;
+  height: 90px;
+  border-radius: 10px;
+  border: 1px solid;
+  -webkit-box-shadow: 2px -2px 5px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 2px -2px 5px 0px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.start_form .calendar_logo .calendar_logo_week_day {
+  height: 30px;
+  background: #de5151;
+  margin: 0;
+  line-height: 30px;
+  text-align: center;
+  font-size: 1.4em;
+}
+.start_form .calendar_logo .calendar_logo_month_day {
+  height: 60px;
+  margin: 0;
+  line-height: 60px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 2.5em;
+}
+.start_form .calendar_title {
+  position: absolute;
+  margin-top: -70px;
+  margin-left: -50px;
+  width: 250px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+form input {
+  margin: 10px 0;
+  display: block;
+  border: none;
+  padding-top: 40px;
+  border-bottom: solid 1px black;
+  -webkit-transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0) 96%, black 4%);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 96%, black 4%);
+  background-repeat: no-repeat;
+  width: 150px;
+  background-position: -150px 0;
+  background-size: 150px 100%;
+  color: #000;
+  font-weight: 600;
+}
+form label {
+  -webkit-transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  position: absolute;
+  color: black;
+  font-weight: 600;
+  margin-top: -35px;
+  cursor: text;
+}
+form input:focus,
+form .inputed {
+  box-shadow: none;
+  outline: 0;
+  background-position: 0 0 !important;
+}
+form input:focus + label,
+form .inputed + label {
+  -webkit-transform: translateY(-20px);
+  transform: translateY(-20px);
+}
+form button {
+  width: 150px;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+  outline: 0;
+  border: none;
+  background: #de5151;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 6px;
+  color: #fff;
+  margin: 25px 0 0;
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
+  -webkit-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  font-weight: 600;
+}
+form p {
+  transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  -webkit-transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  -moz-transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  -o-transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  background: -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0) 88%, #de5151 12%);
+  background: linear-gradient(to top, rgba(255, 255, 255, 0) 87%, #de5151 13%);
+  background-repeat: no-repeat;
+  background-position: -150px 0;
+  background-size: 150px 100%;
+  width: 150px;
+  color: #de5151;
+  position: absolute;
+  margin-top: -13px;
+  height: 20px;
+  font-size: .8em;
+  font-weight: 100;
+  line-height: 22px;
+  box-shadow: none;
+  outline: 0;
+}
+form p span {
+  -webkit-transition: opacity 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  -moz-transition: opacity 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  -ms-transition: opacity 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  -o-transition: opacity 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  transition: opacity 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  opacity: 0;
+}
+form .error {
+  padding: 0;
+  background-position: 0 0 !important;
+}
+form .error span {
+  opacity: 1;
+}
+form .login_error {
+  width: 250px;
+  margin-left: -50px;
+  text-align: center;
+}
+form .login_error span {
+  opacity: 1;
+}
+form .form_border {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 96%, black 4%);
+  position: relative;
+  margin: 5px 0 0 -25px;
+  width: 200px;
+}
+form .form_border span {
+  opacity: 1;
+  color: black;
+  font-weight: 600;
+  background: white;
+  font-size: 1.1em;
+  width: 30px;
+  position: absolute;
+  margin-left: 85px;
+  margin-top: 8px;
+  text-align: center;
+}

@@ -1,6 +1,12 @@
 const initialState = {
-	login: "",
-	password: "",
+	login: {
+	    value: '',
+        className: ''
+    },
+	password: {
+        value: '',
+        className: ''
+    },
 	login_error: {
 		className: "",
 		content: ""
@@ -8,16 +14,33 @@ const initialState = {
     password_error: {
         className: "",
         content: ""
-    }
+    },
+    autorization_error: {
+        className: "",
+        content: ""
+    },
+    days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 };
 
 export default function login(state = initialState, action) {
 	if ( action.type === 'CHANGE_LOGIN') {
-		state.login = action.payload;
+	    if(action.payload.length === 0) {
+	        state.login.className = ''
+        } else {
+            state.login.className = 'inputed'
+        }
+        state.login.value = action.payload;
+        state = Object.assign({}, state);
 		return state;
 	}
     if ( action.type === 'CHANGE_PASSWORD') {
-        state.password = action.payload;
+        if(action.payload.length === 0) {
+            state.password.className = ''
+        } else {
+            state.password.className = 'inputed'
+        }
+        state.password.value = action.payload;
+        state = Object.assign({}, state);
         return state;
     }
     if ( action.type === 'LOGIN_ERROR') {
@@ -27,6 +50,11 @@ export default function login(state = initialState, action) {
     }
     if ( action.type === 'PASSWORD_ERROR') {
         state.password_error = action.payload;
+        state = Object.assign({}, state);
+        return state;
+    }
+    if ( action.type === 'AUTORIZATION_ERROR') {
+        state.autorization_error = action.payload;
         state = Object.assign({}, state);
         return state;
     }

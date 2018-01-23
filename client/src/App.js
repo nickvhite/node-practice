@@ -13,10 +13,26 @@ class App extends Component {
 
     changeLogin(e) {
         this.props.onChangeLogin(e);
+        let login = this.props.eventList.login.login;
+        if (login.value.length > 0) {
+            let errData = {
+                className: '',
+                content: ''
+            };
+            this.props.onShowLoginError(errData)
+        }
     }
 
     changePassword(e) {
         this.props.onChangePassword(e);
+        let password = this.props.eventList.login.password;
+        if (password.value.length > 0) {
+            let errData = {
+                className: '',
+                content: ''
+            };
+            this.props.onShowPasswordError(errData)
+        }
     }
 
     validateForm(e, scenario) {
@@ -24,7 +40,7 @@ class App extends Component {
         e.preventDefault();
         let login = this.props.eventList.login.login;
         let password = this.props.eventList.login.password;
-        if (login.length < 1) {
+        if (login.value.length < 1) {
             let errData = {
                 className: 'error',
                 content: 'Enter Username'
@@ -37,7 +53,7 @@ class App extends Component {
             };
             this.props.onShowLoginError(errData)
         }
-        if (password.length < 1) {
+        if (password.value.length < 1) {
             let errData = {
                 className: 'error',
                 content: 'Enter Password'
