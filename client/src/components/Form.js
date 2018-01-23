@@ -44,12 +44,12 @@ class Form extends Component {
                         {formData.password_error.content}
                     </span></p>
                     <button onClick={(e) => {
-                        this.props.validateForm(e, 'Sign in')
+                        this.props.validateForm(e, 'SignIn')
                     }}>Sign in
                     </button>
                     <p className="form_border"><span>Or</span></p>
                     <button onClick={(e) => {
-                        this.props.validateForm(e, 'Sign up')
+                        this.props.validateForm(e, 'SignUp')
                     }}>Sign up
                     </button>
                 </form>

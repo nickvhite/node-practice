@@ -29,6 +29,7 @@ body {
   line-height: 30px;
   text-align: center;
   font-size: 1.4em;
+  border-bottom: 1px solid;
 }
 .start_form .calendar_logo .calendar_logo_month_day {
   height: 60px;
@@ -132,6 +133,7 @@ form p span {
 form .error {
   padding: 0;
   background-position: 0 0 !important;
+  font-weight: 600;
 }
 form .error span {
   opacity: 1;
