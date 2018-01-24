@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-class Form extends Component {
+class Spinner extends Component {
     render() {
         return (
             <div id="preloader">
@@ -18,4 +18,4 @@ export default connect(
         eventList: state
     }),
     dispatch => ({})
-)(Form);
+)(Spinner);

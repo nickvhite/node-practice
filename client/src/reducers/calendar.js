@@ -1,9 +1,9 @@
 const initialState = {
-    visible: true
+    visible: false
 };
 
-export default function spinner(state = initialState, action) {
-    if ( action.type === 'SHOW_SPINNER') {
+export default function calendar(state = initialState, action) {
+    if ( action.type === 'SHOW_CALENDAR') {
         state.visible = action.payload;
         state = Object.assign({}, state);
         return state;

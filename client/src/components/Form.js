@@ -13,12 +13,12 @@ class Form extends Component {
                 <p className="calendar_title">
                     Sign in or Sign up to calendar
                 </p>
+                <p
+                    className={formData.authorization_error}
+                ><span>
+                    Invalid Username or Password
+                </span></p>
                 <form className="login_form">
-                    <p
-                        className={formData.autorization_error.className}
-                    ><span>
-                        {formData.autorization_error.content}
-                    </span></p>
                     <input
                         type="text"
                         id="login_input"

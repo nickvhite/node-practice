@@ -56,7 +56,7 @@ app.post('/login', (req, res, next) => {
 app.post('/logout', function(req, res, next) {
     if (req.session.user) {
         delete req.session.user;
-        res.end("user loged out")
+        res.end('true');
     }
 });
 
@@ -70,7 +70,7 @@ app.post('/registration', (req, res, next) => {
         .catch(err => res.end(err))
 });
 
-app.get('/autorised', (req, res) => {
+app.post('/autorised', (req, res) => {
     if (req.session.user) {
         res.end('true');
     } else {

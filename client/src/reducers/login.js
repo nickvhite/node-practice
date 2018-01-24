@@ -8,16 +8,18 @@ const initialState = {
         value: '',
         className: ''
     },
-	login_error: {
-		className: "",
-		content: ""
-	},
+	login_error: "",
     password_error: "",
-    autorization_error: "",
+    authorization_error: "authorization_not_error",
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 };
 
 export default function login(state = initialState, action) {
+    if ( action.type === 'SHOW_LOGIN') {
+        state.visible = action.payload;
+        state = Object.assign({}, state);
+        return state;
+    }
 	if ( action.type === 'CHANGE_LOGIN') {
 	    if(action.payload.length === 0) {
 	        state.login.className = ''
@@ -48,8 +50,8 @@ export default function login(state = initialState, action) {
         state = Object.assign({}, state);
         return state;
     }
-    if ( action.type === 'AUTORIZATION_ERROR') {
-        state.autorization_error = action.payload;
+    if ( action.type === 'AUTHORIZATION_ERROR') {
+        state.authorization_error = action.payload;
         state = Object.assign({}, state);
         return state;
     }

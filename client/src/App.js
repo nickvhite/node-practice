@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 
 import Form from './components/Form';
 import Spinner from './components/Spinner';
+import Calendar from './components/Calendar';
 
 
 class App extends Component {
@@ -12,21 +13,17 @@ class App extends Component {
     }
 
     changeLogin(e) {
-        this.props.onChangeLogin(e);
-        let login = this.props.eventList.login.login;
-        if (login.value.length > 0) {
-            let errData = "";
-            this.props.onShowLoginError(errData)
-        }
+        this.props.onChangeLogin(e.target.value);
+        let errData = "";
+        this.props.onShowLoginError(errData);
+        this.props.onShowUserError("authorization_not_error");
     }
 
     changePassword(e) {
-        this.props.onChangePassword(e);
-        let password = this.props.eventList.login.password;
-        if (password.value.length > 0) {
-            let errData = "";
-            this.props.onShowPasswordError(errData)
-        }
+        this.props.onChangePassword(e.target.value);
+        let errData = "";
+        this.props.onShowPasswordError(errData);
+        this.props.onShowUserError("authorization_not_error");
     }
 
     validateForm(e, scenario) {
@@ -43,6 +40,7 @@ class App extends Component {
                 this.props.onShowPasswordError(errData);
             }
         } else {
+            this.props.onShowLoader();
             let userData = {
                 username: login.value,
                 password: password.value
@@ -56,40 +54,50 @@ class App extends Component {
     }
 
     submitLoginForm(data) {
-        var json = JSON.stringify(data);
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", "/login", true); // false for synchronous request
-        xmlHttp.setRequestHeader("Content-type", "application/json");
-        xmlHttp.send(json);
-        xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState !== 4) return;
-            if (xmlHttp.status !== 200) {
-                console.log(xmlHttp.responseText);
+        let that = this;
+        let json = JSON.stringify(data);
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/login", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(json);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
+                console.log(xhr.responseText);
             } else {
-                console.log(xmlHttp.responseText);
+                if (xhr.responseText === 'true') {
+                    that.props.onHideLoader(xhr.responseText === 'true');
+                } else {
+                    that.props.onShowUserError('authorization_error');
+                    that.props.onHideLoader(false);
+                }
             }
         }
     }
 
     submitRegistrationForm(data) {
-        var json = JSON.stringify(data)
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("POST", "/registration", true); // false for synchronous request
-        xmlHttp.setRequestHeader("Content-type", "application/json");
-        xmlHttp.send(json);
-        xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState !== 4) return;
-            if (xmlHttp.status !== 200) {
-                console.log(xmlHttp.responseText);
+        let json = JSON.stringify(data)
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/registration", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(json);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
+                console.log(xhr.responseText);
             } else {
-                console.log(xmlHttp.responseText);
+                console.log(xhr.responseText);
             }
         }
     }
 
-    askAutorization() {
+    logOut() {
+        this.props.onShowLoader();
+        this.props.onChangeLogin('');
+        this.props.onChangePassword('');
+        let that = this;
         let xhr = new XMLHttpRequest();
-        xhr.open("GET", "/autorised", false); // false for synchronous request
+        xhr.open("POST", "/logout", true); // false for synchronous request
         xhr.setRequestHeader("Content-type", "application/json");
         xhr.send();
         xhr.onreadystatechange = function () {
@@ -97,7 +105,23 @@ class App extends Component {
             if (xhr.status !== 200) {
                 console.log(xhr.responseText);
             } else {
+                that.props.onHideLoader(xhr.responseText === 'false');
+            }
+        }
+    }
+
+    askAutorization() {
+        let that = this;
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/autorised", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
                 console.log(xhr.responseText);
+            } else {
+                that.props.onHideLoader(xhr.responseText === 'true');
             }
         }
     }
@@ -111,6 +135,10 @@ class App extends Component {
                 changeLogin={this.changeLogin.bind(this)}
                 changePassword={this.changePassword.bind(this)}
                 validateForm={this.validateForm.bind(this)}
+            />;
+        } else if (this.props.eventList.calendar.visible) {
+            componentsArray = <Calendar
+                logOut={this.logOut.bind(this)}
             />;
         }
         return (
@@ -127,16 +155,29 @@ export default connect(
     }),
     dispatch => ({
         onChangeLogin: (data) => {
-            dispatch({type: 'CHANGE_LOGIN', payload: data.target.value});
+            dispatch({type: 'CHANGE_LOGIN', payload: data});
         },
         onChangePassword: (data) => {
-            dispatch({type: 'CHANGE_PASSWORD', payload: data.target.value});
+            dispatch({type: 'CHANGE_PASSWORD', payload: data});
         },
         onShowLoginError: (data) => {
             dispatch({type: 'LOGIN_ERROR', payload: data});
         },
         onShowPasswordError: (data) => {
             dispatch({type: 'PASSWORD_ERROR', payload: data});
+        },
+        onShowUserError: (data) => {
+            dispatch({type: 'AUTHORIZATION_ERROR', payload: data});
+        },
+        onHideLoader: (data) => {
+            dispatch({type: 'SHOW_SPINNER', payload: false});
+            dispatch({type: 'SHOW_LOGIN', payload: !data});
+            dispatch({type: 'SHOW_CALENDAR', payload: data});
+        },
+        onShowLoader: () => {
+            dispatch({type: 'SHOW_SPINNER', payload: true});
+            dispatch({type: 'SHOW_LOGIN', payload: false});
+            dispatch({type: 'SHOW_CALENDAR', payload: false});
         }
     })
 )(App);

@@ -20,8 +20,8 @@ export function checkUser(data) {
                 if ( user.password === data.password){
                     return Promise.resolve('true')
                 } else {
-                    return Promise.reject("Uncnown user")
+                    return Promise.reject("Uncnown user1")
                 }
             })
-            .catch(err => Promise.reject("Uncnown user"))
+            .catch(err => Promise.reject("Uncnown user2"))
 }
