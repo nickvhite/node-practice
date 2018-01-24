@@ -28,8 +28,8 @@ class Form extends Component {
                         className={formData.login.className}
                     />
                     <label htmlFor="login_input" id="login_input_label">Username</label>
-                    <p className={formData.login_error.className}><span>
-                        {formData.login_error.content}
+                    <p className={formData.login_error}><span>
+                        Enter Username
                     </span></p>
                     <input
                         type="password"
@@ -40,8 +40,8 @@ class Form extends Component {
                         className={formData.password.className}
                     />
                     <label htmlFor="password_input" id="password_input_label">Password</label>
-                    <p className={formData.password_error.className}><span>
-                        {formData.password_error.content}
+                    <p className={formData.password_error}><span>
+                        Enter Password
                     </span></p>
                     <button onClick={(e) => {
                         this.props.validateForm(e, 'SignIn')

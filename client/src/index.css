@@ -164,3 +164,46 @@ form .form_border span {
   margin-top: 8px;
   text-align: center;
 }
+#preloader {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+#preloader .spinWrap {
+  width: 200px;
+  height: 100px;
+  position: fixed;
+  top: 42%;
+  left: 50%;
+  margin-left: -98px;
+  margin-top: -50px;
+}
+#preloader .spinWrap .loader {
+  margin: 0 0 0 -55px;
+  background-color: transparent;
+  -webkit-animation: rotation .7s infinite linear;
+  animation: rotation .7s infinite linear;
+  border-left: 5px solid #cbcbca;
+  border-right: 5px solid #cbcbca;
+  border-bottom: 5px solid #cbcbca;
+  border-top: 5px solid #de5151;
+  border-radius: 100%;
+  height: 100px;
+  width: 100px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  opacity: 1;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}

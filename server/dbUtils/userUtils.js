@@ -9,7 +9,7 @@ export function createUser(data) {
         username: data.username,
         password: data.password
     }).save()
-        .then(userData => Promise.resolve("User created"))
+        .then(userData => Promise.resolve('true'))
         .catch(err => Promise.reject("User already exist"));
 }
 
@@ -18,20 +18,10 @@ export function checkUser(data) {
         .findOne({username: data.username})
             .then(function(user){
                 if ( user.password === data.password){
-                    return Promise.resolve(user)
+                    return Promise.resolve('true')
                 } else {
-                    return Promise.reject("Uncnown password")
+                    return Promise.reject("Uncnown user")
                 }
             })
             .catch(err => Promise.reject("Uncnown user"))
-}
-
-export function deleteUser(data) {
-    return User
-        .findOne({username: data.username})
-            .then(function(user){
-                user.remove();
-                return Promise.resolve("User deleted");
-            })
-            .catch(err => Promise.reject("Uncnown user"));
 }

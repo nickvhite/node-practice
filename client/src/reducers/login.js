@@ -1,4 +1,5 @@
 const initialState = {
+    visible: false,
 	login: {
 	    value: '',
         className: ''
@@ -11,14 +12,8 @@ const initialState = {
 		className: "",
 		content: ""
 	},
-    password_error: {
-        className: "",
-        content: ""
-    },
-    autorization_error: {
-        className: "",
-        content: ""
-    },
+    password_error: "",
+    autorization_error: "",
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 };
 

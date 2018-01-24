@@ -28,25 +28,24 @@ app.use(session({
 }));
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 
-app.get('*', function(req, res, next) {
+app.get('*', (req, res) => {
     if (req.session.user) {
-        res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+        res.sendFile(path.resolve(__dirname, '../client/build'));
     } else {
-        res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+        res.sendFile(path.resolve(__dirname, '../client/build'));
     }
 });
 
-
 app.post('/login', (req, res, next) => {
-    if (req.session.user) { 
+    if (req.session.user) {
         res.end("user already logged in");
         return;
     }
     return User.checkUser(req.body)
         .then(user => {
             if(user){
-                req.session.user = {id: user._id, name: user.username}
-                res.end("user logged in");
+                req.session.user = {id: user._id, name: user.username};
+                res.end('true');
             } else {
                 return res.end(error);
             }
@@ -71,10 +70,12 @@ app.post('/registration', (req, res, next) => {
         .catch(err => res.end(err))
 });
 
-app.delete('/user', (req, res, next) => {
-    User.deleteUser(req.body)
-        .then(data => res.end(data))
-        .catch(err => res.end(err))
+app.get('/autorised', (req, res) => {
+    if (req.session.user) {
+        res.end('true');
+    } else {
+        res.end('false');
+    }
 });
 
 module.exports = app;

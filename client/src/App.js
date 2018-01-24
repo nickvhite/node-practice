@@ -2,23 +2,20 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 import Form from './components/Form';
+import Spinner from './components/Spinner';
 
 
 class App extends Component {
     constructor(props) {
         super(props);
-        // this.askAutorization();
-        this.state = this.props;
+        this.askAutorization();
     }
 
     changeLogin(e) {
         this.props.onChangeLogin(e);
         let login = this.props.eventList.login.login;
         if (login.value.length > 0) {
-            let errData = {
-                className: '',
-                content: ''
-            };
+            let errData = "";
             this.props.onShowLoginError(errData)
         }
     }
@@ -27,10 +24,7 @@ class App extends Component {
         this.props.onChangePassword(e);
         let password = this.props.eventList.login.password;
         if (password.value.length > 0) {
-            let errData = {
-                className: '',
-                content: ''
-            };
+            let errData = "";
             this.props.onShowPasswordError(errData)
         }
     }
@@ -41,24 +35,18 @@ class App extends Component {
         let password = this.props.eventList.login.password;
         if(login.value.length < 1 || password.value.length < 1) {
             if (login.value.length < 1) {
-                let errData = {
-                    className: 'error',
-                    content: 'Enter Username'
-                };
+                let errData = 'error';
                 this.props.onShowLoginError(errData);
             }
             if (password.value.length < 1) {
-                let errData = {
-                    className: 'error',
-                    content: 'Enter Password'
-                };
+                let errData = 'error';
                 this.props.onShowPasswordError(errData);
             }
         } else {
             let userData = {
                 username: login.value,
                 password: password.value
-            }
+            };
             if(scenario === 'SignIn') {
                 this.submitLoginForm(userData);
             } else {
@@ -101,7 +89,8 @@ class App extends Component {
 
     askAutorization() {
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", "/autorised", true); // false for synchronous request
+        xhr.open("GET", "/autorised", false); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
         xhr.send();
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== 4) return;
@@ -114,13 +103,19 @@ class App extends Component {
     }
 
     render() {
+        let componentsArray;
+        if (this.props.eventList.spinner.visible) {
+            componentsArray = <Spinner />;
+        } else if (this.props.eventList.login.visible) {
+            componentsArray = <Form
+                changeLogin={this.changeLogin.bind(this)}
+                changePassword={this.changePassword.bind(this)}
+                validateForm={this.validateForm.bind(this)}
+            />;
+        }
         return (
             <div className="container">
-                <Form
-                    changeLogin={this.changeLogin.bind(this)}
-                    changePassword={this.changePassword.bind(this)}
-                    validateForm={this.validateForm.bind(this)}
-                />
+                { componentsArray }
             </div>
         )
     }
