@@ -25,15 +25,15 @@ app.use(session({
   store: new MongoStore({ 
     url: 'mongodb://nickvhite:Nick123nick@ds159707.mlab.com:59707/calendardb',
   })
-}))
+}));
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 
 app.get('*', function(req, res, next) {
-    if (req.session.user) { 
-        res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));    
+    if (req.session.user) {
+        res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
     } else {
-        res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));    
-    }    
+        res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+    }
 });
 
 
