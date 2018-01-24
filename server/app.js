@@ -39,49 +39,42 @@ app.get('*', function(req, res, next) {
 
 app.post('/login', (req, res, next) => {
     if (req.session.user) { 
-        res.send("user already logged in");
+        res.end("user already logged in");
         return;
     }
     return User.checkUser(req.body)
         .then(user => {
             if(user){
                 req.session.user = {id: user._id, name: user.username}
-                res.send("user logged in");
+                res.end("user logged in");
             } else {
-                return next(error);
+                return res.end(error);
             }
         })
-        .catch(err => next(err))
+        .catch(err => res.end(err))
 });
 
 app.post('/logout', function(req, res, next) {
     if (req.session.user) {
         delete req.session.user;
-        res.send("user loged out")
+        res.end("user loged out")
     }
 });
 
 app.post('/registration', (req, res, next) => {
+    if (req.session.user) { 
+        res.end("logged user can`t register");
+        return;
+    }
     User.createUser(req.body)
-        .then(data => res.send(data))
-        .catch(err => res.send(err))
+        .then(data => res.end(data))
+        .catch(err => res.end(err))
 });
 
 app.delete('/user', (req, res, next) => {
     User.deleteUser(req.body)
-        .then(data => res.send(data))
-        .catch(err => res.send(err))
+        .then(data => res.end(data))
+        .catch(err => res.end(err))
 });
 
 module.exports = app;
-
-// var data = JSON.stringify({username: 'test1', password: 'test1'})
-// var xmlHttp = new XMLHttpRequest();
-// xmlHttp.open("POST", "/login", false); // false for synchronous request
-// xmlHttp.setRequestHeader("Content-type", "application/json");
-// xmlHttp.send(data);
-
-// var data = JSON.stringify({username: 'test1', password: 'test1'})
-// var xmlHttp = new XMLHttpRequest();
-// xmlHttp.open("POST", "/logout", false); // false for synchronous request
-// xmlHttp.send();

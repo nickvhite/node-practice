@@ -36,45 +36,67 @@ class App extends Component {
     }
 
     validateForm(e, scenario) {
-        console.log(scenario);
         e.preventDefault();
         let login = this.props.eventList.login.login;
         let password = this.props.eventList.login.password;
-        if (login.value.length < 1) {
-            let errData = {
-                className: 'error',
-                content: 'Enter Username'
-            };
-            this.props.onShowLoginError(errData)
+        if(login.value.length < 1 || password.value.length < 1) {
+            if (login.value.length < 1) {
+                let errData = {
+                    className: 'error',
+                    content: 'Enter Username'
+                };
+                this.props.onShowLoginError(errData);
+            }
+            if (password.value.length < 1) {
+                let errData = {
+                    className: 'error',
+                    content: 'Enter Password'
+                };
+                this.props.onShowPasswordError(errData);
+            }
         } else {
-            let errData = {
-                className: '',
-                content: ''
-            };
-            this.props.onShowLoginError(errData)
+            let userData = {
+                username: login.value,
+                password: password.value
+            }
+            if(scenario === 'SignIn') {
+                this.submitLoginForm(userData);
+            } else {
+                this.submitRegistrationForm(userData);
+            }
         }
-        if (password.value.length < 1) {
-            let errData = {
-                className: 'error',
-                content: 'Enter Password'
-            };
-            this.props.onShowPasswordError(errData)
-        } else {
-            let errData = {
-                className: '',
-                content: ''
-            };
-            this.props.onShowPasswordError(errData)
-        }
-        return
     }
 
     submitLoginForm(data) {
-        console.log(data)
+        var json = JSON.stringify(data);
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", "/login", true); // false for synchronous request
+        xmlHttp.setRequestHeader("Content-type", "application/json");
+        xmlHttp.send(json);
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState !== 4) return;
+            if (xmlHttp.status !== 200) {
+                console.log(xmlHttp.responseText);
+            } else {
+                console.log(xmlHttp.responseText);
+            }
+        }
     }
 
     submitRegistrationForm(data) {
-        console.log(data)
+        var json = JSON.stringify(data)
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("POST", "/registration", true); // false for synchronous request
+        xmlHttp.setRequestHeader("Content-type", "application/json");
+        xmlHttp.send(json);
+        xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState !== 4) return;
+            if (xmlHttp.status !== 200) {
+                console.log(xmlHttp.responseText);
+            } else {
+                console.log(xmlHttp.responseText);
+            }
+        }
     }
 
     askAutorization() {
