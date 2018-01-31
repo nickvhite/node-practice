@@ -14,9 +14,9 @@ class Form extends Component {
                     Sign in or Sign up to calendar
                 </p>
                 <p
-                    className={formData.authorization_error}
+                    className={formData.authorization_error.className}
                 ><span>
-                    Invalid Username or Password
+                    {formData.authorization_error.text}
                 </span></p>
                 <form className="login_form">
                     <input

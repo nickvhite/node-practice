@@ -16,14 +16,14 @@ class App extends Component {
         this.props.onChangeLogin(e.target.value);
         let errData = "";
         this.props.onShowLoginError(errData);
-        this.props.onShowUserError("authorization_not_error");
+        this.props.onShowUserError({className: "authorization_not_error", text: " "});
     }
 
     changePassword(e) {
         this.props.onChangePassword(e.target.value);
         let errData = "";
         this.props.onShowPasswordError(errData);
-        this.props.onShowUserError("authorization_not_error");
+        this.props.onShowUserError({className: "authorization_not_error", text: " "});
     }
 
     validateForm(e, scenario) {
@@ -68,7 +68,7 @@ class App extends Component {
                 if (xhr.responseText === 'true') {
                     that.props.onHideLoader(xhr.responseText === 'true');
                 } else {
-                    that.props.onShowUserError('authorization_error');
+                    that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
                     that.props.onHideLoader(false);
                 }
             }
@@ -76,6 +76,7 @@ class App extends Component {
     }
 
     submitRegistrationForm(data) {
+        let that = this;
         let json = JSON.stringify(data)
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "/registration", true); // false for synchronous request
@@ -86,7 +87,12 @@ class App extends Component {
             if (xhr.status !== 200) {
                 console.log(xhr.responseText);
             } else {
-                console.log(xhr.responseText);
+                if (xhr.responseText === 'true') {
+                    that.props.onHideLoader(xhr.responseText === 'true');
+                } else {
+                    that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
+                    that.props.onHideLoader(false);
+                }
             }
         }
     }
@@ -112,18 +118,187 @@ class App extends Component {
 
     askAutorization() {
         let that = this;
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", "/autorised", true); // false for synchronous request
-        xhr.setRequestHeader("Content-type", "application/json");
-        xhr.send();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState !== 4) return;
-            if (xhr.status !== 200) {
-                console.log(xhr.responseText);
-            } else {
-                that.props.onHideLoader(xhr.responseText === 'true');
-            }
+        // let xhr = new XMLHttpRequest();
+        // xhr.open("POST", "/autorised", true); // false for synchronous request
+        // xhr.setRequestHeader("Content-type", "application/json");
+        // xhr.send();
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState !== 4) return;
+        //     if (xhr.status !== 200) {
+        //         console.log(xhr.responseText);
+        //     } else {
+        //         that.props.onHideLoader(xhr.responseText === 'true');
+        //     }
+        // }
+        that.props.onHideLoader(true);
+    }
+
+    buildTimes() {
+        let dayStart = this.props.eventList.calendar.dayStart.getTime(),
+            dayEnd = this.props.eventList.calendar.dayEnd.getTime(),
+            stepTime = (30 * 60 * 1000),
+            timesArray = [];
+        for (let i = dayStart; i <= dayEnd; i += stepTime) {
+            let dt = this.normalizeDate(new Date(i));
+            timesArray.push(dt);
         }
+        return (
+            timesArray.map((item, key) => {
+                return <p
+                    key={key}
+                >
+                    {item}
+                </p>
+            })
+        )
+    }
+
+    normalizeDate(date) {
+        var min = date.getMinutes();
+        var hours24 = date.getHours();
+        var hour = (hours24 + 11) % 12 + 1;
+        if (min === 0) {
+            min = "00";
+        }
+        var time = hour + ":" + min;
+        return time;
+    }
+
+    createEvents(events) {
+        let collisions = this.getCollisions(events),
+            attributes = this.getAttributes(events, collisions);
+        return events.map((event, id) => {
+            let height = event.duration,
+                top = event.start,
+                width = attributes.width,
+                leftOffSet = attributes.leftOffSet,
+                containerWidth = 200;
+            let units = width[id];
+            if (!units) {
+                units = 1
+            }
+            let left = (containerWidth / width[id]) * (leftOffSet[id] - 1);
+            if (!left || left < 0) {
+                left = 0
+            }
+            width = containerWidth / units;
+            let  style={
+                width: `${width}px`,
+                height: `${height}px`,
+                marginTop: `${top}px`,
+                marginLeft: `${left}px`
+            };
+            return (
+                <div
+                    data-event-id={id}
+                    key={id}
+                    className="event"
+                    style={style}
+                    onClick={(e) => {
+                        console.log(e.target.getAttribute('data-event-id'));
+                    }}
+                    alt={event.title}
+                >
+                    <p
+                        data-event-id={id}
+                    >
+                        {event.title}
+                    </p>
+                </div>
+            )
+        });
+    }
+
+    getCollisions(events) {
+        let collisions = [];
+        let step = 15;
+        let stepsLimit = (this.props.eventList.calendar.dayEnd.getHours() - this.props.eventList.calendar.dayStart.getHours()) * (60 / step);
+        for (var i = 0; i < stepsLimit; i++) {
+            var time = [];
+            for (var j = 0; j < events.length; j++) {
+                time.push(0);
+            }
+            collisions.push(time);
+        }
+        events.forEach((event, id) => {
+            let end = event.start + event.duration;
+            let order = 1;
+            let start = event.start;
+            while (start < end) {
+                let timeIndex = Math.floor(start / step);
+                while (order < events.length) {
+                    if (collisions[timeIndex].indexOf(order) === -1) {
+                        break;
+                    }
+                    order++;
+                }
+                collisions[timeIndex][id] = order;
+                start = start + step;
+            }
+            collisions[Math.floor((end - 1) / step)][id] = order;
+        });
+        return collisions;
+    }
+
+    getAttributes(events, collisions) {
+        let width = [];
+        let leftOffSet = [];
+        for (var i = 0; i < events.length; i++) {
+            width.push(0);
+            leftOffSet.push(0);
+        }
+        collisions.forEach((period) => {
+            let count = period.reduce((a, b) => {
+                return b ? a + 1 : a;
+            });
+            if (count > 1) {
+                period.forEach((event, id) => {
+                    if (period[id]) {
+                        if (count > width[id]) {
+                            width[id] = count;
+                        }
+                    }
+                    if (period[id] && !leftOffSet[id]) {
+                        leftOffSet[id] = period[id];
+                    }
+                })
+            }
+        });
+        return {
+            width: width,
+            leftOffSet: leftOffSet
+        }
+    }
+
+    addEvent(e) {
+        const that = this;
+        let createrData = {
+            top: 0,
+            height: 0
+        };
+        let startData = 0;
+        function setParams(event) {
+            if (!startData) {
+                startData = event.clientY;
+            }
+            if (event.clientY >= 20 && event.clientY <= 590) {
+                createrData.top = startData < event.clientY ? startData : event.clientY;
+                createrData.height = startData <= event.clientY ? event.clientY - startData : startData - event.clientY;
+            };
+            that.props.onUpdateEventCreater(createrData);
+        };
+        function mouseUp(e) {
+            setParams(e);
+            let updaterData = {
+                top: e.clientY - 75,
+                left: e.clientX + 10
+            };
+            document.body.removeEventListener('mousemove', setParams);
+            that.props.onShowEventUpdater(updaterData);
+            document.body.removeEventListener('mouseup', mouseUp);
+        }
+        document.body.addEventListener('mousemove', setParams);
+        document.body.addEventListener('mouseup', mouseUp);
     }
 
     render() {
@@ -138,7 +313,11 @@ class App extends Component {
             />;
         } else if (this.props.eventList.calendar.visible) {
             componentsArray = <Calendar
+                buildTimes={this.buildTimes.bind(this)}
+                createEvents={this.createEvents.bind(this)}
+                addEvent={this.addEvent.bind(this)}
                 logOut={this.logOut.bind(this)}
+                onShowEventUpdater={this.props.onShowEventUpdater.bind(this)}
             />;
         }
         return (
@@ -178,6 +357,12 @@ export default connect(
             dispatch({type: 'SHOW_SPINNER', payload: true});
             dispatch({type: 'SHOW_LOGIN', payload: false});
             dispatch({type: 'SHOW_CALENDAR', payload: false});
+        },
+        onShowEventUpdater: (top) => {
+            dispatch({type: 'SHOW_EVENT_UPDATER', payload: top});
+        },
+        onUpdateEventCreater: (data) => {
+            dispatch({type: 'UPDATE_EVENT_CREATER', payload: data});
         }
     })
 )(App);

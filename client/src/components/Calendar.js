@@ -4,15 +4,44 @@ import {connect} from 'react-redux';
 class Calendar extends Component {
     render() {
         let calendarData = this.props.eventList.calendar;
+        let updaterData = this.props.eventList.eventUpdater;
+        let newEventStyle = {
+            top: calendarData.createrTop,
+            height: calendarData.createrHeight
+        };
+        let updaterStyle = {
+            top: updaterData.updaterTop,
+            left: updaterData.updaterLeft
+        };
         return (
-            <div id="calendar">
+            <div id="calendar_container">
+                <div id="time_list">
+                    {this.props.buildTimes()}
+                </div>
+                <div
+                    id="event_list"
+                    onMouseDown={this.props.addEvent}
+                 >
+                    {this.props.createEvents(calendarData.events)}
+                </div>
                 <p
-                    className="log_out_button"
-                    onClick={this.props.logOut}
+                    className="new_event"
+                    style = {newEventStyle}
                 >
-                    Sign Out
                 </p>
-                <h1>CALENDAR</h1>
+                {updaterData.visible ? <div
+                    className="event_updater_container"
+                    onClick={(e) => {
+                        this.props.onShowEventUpdater({top: 0, left:0});
+                    }}
+                >
+                    <div
+                        className="event_updater"
+                        style={updaterStyle}
+                    >
+
+                    </div>
+                </div> : null}
             </div>
         );
     }

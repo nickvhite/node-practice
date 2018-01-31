@@ -10,7 +10,7 @@ export function createUser(data) {
         password: data.password
     }).save()
         .then(userData => Promise.resolve('true'))
-        .catch(err => Promise.reject("User already exist"));
+        .catch(err => Promise.reject("Username not unique"));
 }
 
 export function checkUser(data) {
@@ -18,10 +18,10 @@ export function checkUser(data) {
         .findOne({username: data.username})
             .then(function(user){
                 if ( user.password === data.password){
-                    return Promise.resolve('true')
+                    return Promise.resolve(user)
                 } else {
-                    return Promise.reject("Uncnown user1")
+                    return Promise.reject("Uncnown user")
                 }
             })
-            .catch(err => Promise.reject("Uncnown user2"))
+            .catch(err => Promise.reject("Uncnown user"))
 }

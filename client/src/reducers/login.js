@@ -10,7 +10,10 @@ const initialState = {
     },
 	login_error: "",
     password_error: "",
-    authorization_error: "authorization_not_error",
+    authorization_error: {
+        className: "authorization_not_error",
+        text: ' '
+    },
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 };
 
