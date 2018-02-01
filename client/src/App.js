@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import Form from './components/Form';
 import Spinner from './components/Spinner';
 import Calendar from './components/Calendar';
+import Updater from './components/Updater';
 
 
 class App extends Component {
@@ -164,6 +165,27 @@ class App extends Component {
         return time;
     }
 
+    normalizeEventDate(date) {
+        var min = date.getMinutes();
+        var hours24 = date.getHours();
+        var hour = (hours24 + 11) % 12 + 1;
+        if (hour < 10) {
+            hour = "0" + hour;
+        }
+        if (min === 0) {
+            min = "00";
+        }
+        var time = hour + ":" + min;
+        return time;
+    }
+
+    getTime(time) {
+        let startDay = this.props.eventList.calendar.dayStart;
+        time = time * 60 * 1000;
+        let newTime = new Date(startDay.getTime() + time);
+        return this.normalizeEventDate(newTime);
+    }
+
     createEvents(events) {
         let collisions = this.getCollisions(events),
             attributes = this.getAttributes(events, collisions);
@@ -194,9 +216,6 @@ class App extends Component {
                     key={id}
                     className="event"
                     style={style}
-                    onClick={(e) => {
-                        console.log(e.target.getAttribute('data-event-id'));
-                    }}
                     alt={event.title}
                 >
                     <p
@@ -270,7 +289,8 @@ class App extends Component {
         }
     }
 
-    addEvent(e) {
+    eventUpdater(e) {
+        this.props.onShowUpdater(true);
         const that = this;
         let createrData = {
             top: 0,
@@ -279,20 +299,34 @@ class App extends Component {
         let startData = 0;
         function setParams(event) {
             if (!startData) {
-                startData = event.clientY;
+                startData = Math.floor((event.clientY - 20) / 15) * 15 + 20;
             }
             if (event.clientY >= 20 && event.clientY <= 590) {
                 createrData.top = startData < event.clientY ? startData : event.clientY;
-                createrData.height = startData <= event.clientY ? event.clientY - startData : startData - event.clientY;
+                createrData.top = Math.floor((createrData.top - 20) / 15) * 15 + 20;
+                createrData.height = startData < event.clientY ? event.clientY - startData : startData - event.clientY + 15;
+                createrData.height = Math.ceil((createrData.height) / 15) * 15;
             };
             that.props.onUpdateEventCreater(createrData);
         };
         function mouseUp(e) {
-            setParams(e);
             let updaterData = {
-                top: e.clientY - 75,
-                left: e.clientX + 10
+                visible: true,
+                top: (e.clientY - 75) < 0 ? 10 : e.clientY - 75,
+                left: e.clientX + 10,
+                event: {}
             };
+            if (e.target.getAttribute('data-event-id')) {
+                updaterData.event.start = that.getTime(that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].start);
+                updaterData.event.end = that.getTime(that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].start +
+                    that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].duration);
+                updaterData.event.title = that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].title;
+            } else {
+                setParams(e);
+                updaterData.event.start = that.getTime(createrData.top - 20);
+                updaterData.event.end = that.getTime(createrData.height + createrData.top - 20);
+                updaterData.event.title = '';
+            }
             document.body.removeEventListener('mousemove', setParams);
             that.props.onShowEventUpdater(updaterData);
             document.body.removeEventListener('mouseup', mouseUp);
@@ -301,24 +335,60 @@ class App extends Component {
         document.body.addEventListener('mouseup', mouseUp);
     }
 
+    hideEventUpdater(e) {
+        if(e.target.className ==='event_updater'
+            || e.target.parentElement.className ==='event_updater') {
+            return;
+        }
+        this.props.onShowUpdater(false);
+        this.props.onShowEventUpdater();
+        this.props.onUpdateEventCreater({top: 0, height: 0});
+    }
+
+    updateEventStart(e) {
+        this.props.onUpdateEventStart(e.target.value)
+    }
+
+    updateEventTitle(e) {
+        this.props.onUpdateEventTitle(e.target.value);
+    }
+
+    updateEventDuration(e) {
+        this.props.onUpdateEventDuration(e.target.value)
+    }
+
     render() {
-        let componentsArray;
+        let componentsArray = [];
         if (this.props.eventList.spinner.visible) {
-            componentsArray = <Spinner />;
-        } else if (this.props.eventList.login.visible) {
-            componentsArray = <Form
+            componentsArray.push(<Spinner
+            key="Spinner"/>);
+        }
+        if (this.props.eventList.login.visible) {
+            componentsArray.push(<Form
+                key="Form"
                 changeLogin={this.changeLogin.bind(this)}
                 changePassword={this.changePassword.bind(this)}
                 validateForm={this.validateForm.bind(this)}
-            />;
-        } else if (this.props.eventList.calendar.visible) {
-            componentsArray = <Calendar
+            />);
+        }
+        if (this.props.eventList.calendar.visible) {
+            componentsArray.push(<Calendar
+                key="Calendar"
                 buildTimes={this.buildTimes.bind(this)}
                 createEvents={this.createEvents.bind(this)}
-                addEvent={this.addEvent.bind(this)}
+                eventUpdater={this.eventUpdater.bind(this)}
                 logOut={this.logOut.bind(this)}
-                onShowEventUpdater={this.props.onShowEventUpdater.bind(this)}
-            />;
+            />);
+        }
+        if (this.props.eventList.eventUpdater.visible) {
+            componentsArray.push(<Updater
+                key="Updater"
+                hideEventUpdater={this.hideEventUpdater.bind(this)}
+                getTime={this.getTime.bind(this)}
+                updateEventStart={this.updateEventStart.bind(this)}
+                updateEventTitle={this.updateEventTitle.bind(this)}
+                updateEventDuration={this.updateEventDuration.bind(this)}
+            />);
         }
         return (
             <div className="container">
@@ -358,11 +428,35 @@ export default connect(
             dispatch({type: 'SHOW_LOGIN', payload: false});
             dispatch({type: 'SHOW_CALENDAR', payload: false});
         },
-        onShowEventUpdater: (top) => {
-            dispatch({type: 'SHOW_EVENT_UPDATER', payload: top});
+        onShowEventUpdater: (data) => {
+            if (!data) {
+                data = {
+                    visible: false,
+                    top: 0,
+                    left: 0,
+                    event: {
+                        start: 0,
+                        duration: 0,
+                        title: ''
+                    }
+                }
+            }
+            dispatch({type: 'SHOW_EVENT_UPDATER', payload: data});
+        },
+        onShowUpdater: (flag) => {
+            dispatch({type: 'SHOW_UPDATER', payload: flag});
         },
         onUpdateEventCreater: (data) => {
             dispatch({type: 'UPDATE_EVENT_CREATER', payload: data});
+        },
+        onUpdateEventStart: (data) => {
+            dispatch({type: 'UPDATE_EVENT_START', payload: data});
+        },
+        onUpdateEventTitle: (data) => {
+            dispatch({type: 'UPDATE_EVENT_TITLE', payload: data});
+        },
+        onUpdateEventDuration: (data) => {
+            dispatch({type: 'UPDATE_EVENT_DURATION', payload: data});
         }
     })
 )(App);

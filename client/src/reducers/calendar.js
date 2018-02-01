@@ -2,8 +2,6 @@ const initialState = {
     visible: false,
     dayStart: new Date(null, null, null, 8, 0, 0),
     dayEnd: new Date(null, null, null, 17, 0, 0),
-    createrTop: 0,
-    createrHeight: 0,
     events: [
         {start: 0, duration: 15, title: "Exercise"},
         {start: 25, duration: 30, title: "Travel to work"},
@@ -20,12 +18,6 @@ const initialState = {
 export default function calendar(state = initialState, action) {
     if ( action.type === 'SHOW_CALENDAR') {
         state.visible = action.payload;
-        state = Object.assign({}, state);
-        return state;
-    }
-    if ( action.type === 'UPDATE_EVENT_CREATER') {
-        state.createrTop = action.payload.top;
-        state.createrHeight = action.payload.height;
         state = Object.assign({}, state);
         return state;
     }
