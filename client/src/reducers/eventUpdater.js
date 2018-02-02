@@ -6,8 +6,8 @@ const initialState = {
     createrTop: 0,
     createrHeight: 0,
     currentEvent: {
-        start: null,
-        end: null,
+        start: {},
+        end: {},
         title: null
     }
 };

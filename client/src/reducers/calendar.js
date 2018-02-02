@@ -21,5 +21,20 @@ export default function calendar(state = initialState, action) {
         state = Object.assign({}, state);
         return state;
     }
+    if (action.type === 'UPDATE_EVENT') {
+        state.events[action.payload.id] = action.payload.event;
+        state = Object.assign({}, state);
+        return state;
+    }
+    if (action.type === 'REMOVE_EVENT') {
+        delete state.events[action.payload];
+        state = Object.assign({}, state);
+        return state;
+    }
+    if (action.type === 'ADD_EVENT') {
+        state.events.push(action.payload);
+        state = Object.assign({}, state);
+        return state;
+    }
     return state;
 }

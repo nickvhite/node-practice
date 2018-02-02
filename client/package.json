@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "moment": "^2.19.1",
     "node-less-chokidar": "^0.1.2",
     "npm-run-all": "^4.1.2",
+    "rc-time-picker": "^3.2.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "5.0.6",

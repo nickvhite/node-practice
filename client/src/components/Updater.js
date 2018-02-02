@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import TimePicker from 'rc-time-picker';
+import 'rc-time-picker/assets/index.css';
 
 class Calendar extends Component {
     render() {
@@ -12,6 +14,7 @@ class Calendar extends Component {
             top: updaterData.updaterTop,
             left: updaterData.updaterLeft
         };
+        // console.log(updaterData.currentEvent.start._d > updaterData.currentEvent.end._d);
         return (
             <div id="updater_container">
                 <p
@@ -35,27 +38,39 @@ class Calendar extends Component {
                                 onClick={(e) => {
                                     this.props.hideEventUpdater(e);
                                 }}
-                            >
-
-                            </p>
-                            <p className="save_button"></p>
-                            <p className="delete_button"></p>
+                            ></p>
+                            <p
+                                className="save_button"
+                                onClick={(e) => {
+                                    this.props.addEvent(updaterData.currentEvent);
+                                }}
+                            ></p>
+                            <p
+                                className="delete_button"
+                                onClick={(e) => {
+                                    this.props.removeEvent(updaterData.currentEvent);
+                                }}
+                            ></p>
                         </div>
-                        <input
+                        <TimePicker
                             className="time_input"
-                            type="time"
-                            min="01:00"
-                            max="12:59"
-                            value={updaterData.currentEvent.start}
+                            showSecond={false}
+                            defaultValue={updaterData.currentEvent.start}
+                            format='h:mm a'
                             onChange={this.props.updateEventStart}
+                            disabledHours={this.props.disabledStartHours}
+                            minuteStep={5}
+                            use12Hours
                         />
-                        <input
+                        <TimePicker
                             className="time_input"
-                            type="time"
-                            min="01:00"
-                            max="12:59"
-                            value={updaterData.currentEvent.end}
+                            showSecond={false}
+                            defaultValue={updaterData.currentEvent.end}
+                            format='h:mm a'
                             onChange={this.props.updateEventDuration}
+                            disabledHours={this.props.disabledEndHours}
+                            minuteStep={5}
+                            use12Hours
                         />
                         <input
                             className="title_input"

@@ -308,8 +308,8 @@ form .form_border span {
 }
 .event_updater .time_input {
   display: inline-block;
-  width: 80px;
-  margin: 10px 5px 0;
+  width: 85px;
+  margin: 10px 0 0;
   text-align: center;
   line-height: 16px;
 }
@@ -349,6 +349,14 @@ form .form_border span {
   margin-top: 70px;
   border: 5px solid #ffffff00;
   border-right: 5px solid #6E9ECF;
+}
+.rc-time-picker-panel-combobox * {
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+}
+li.rc-time-picker-panel-select-option-disabled {
+  display: none;
 }
 @keyframes rotation {
   0% {

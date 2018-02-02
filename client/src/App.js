@@ -5,6 +5,7 @@ import Form from './components/Form';
 import Spinner from './components/Spinner';
 import Calendar from './components/Calendar';
 import Updater from './components/Updater';
+import moment from 'moment';
 
 
 class App extends Component {
@@ -166,16 +167,15 @@ class App extends Component {
     }
 
     normalizeEventDate(date) {
-        var min = date.getMinutes();
-        var hours24 = date.getHours();
-        var hour = (hours24 + 11) % 12 + 1;
+        let min = date.getMinutes(),
+            hour = date.getHours();
         if (hour < 10) {
             hour = "0" + hour;
         }
         if (min === 0) {
             min = "00";
         }
-        var time = hour + ":" + min;
+        let time = moment().hour(hour).minute(min);
         return time;
     }
 
@@ -231,7 +231,7 @@ class App extends Component {
     getCollisions(events) {
         let collisions = [];
         let step = 15;
-        let stepsLimit = (this.props.eventList.calendar.dayEnd.getHours() - this.props.eventList.calendar.dayStart.getHours()) * (60 / step);
+        let stepsLimit = (this.props.eventList.calendar.dayEnd.getHours() - this.props.eventList.calendar.dayStart.getHours()) * (60 / step) + 2;
         for (var i = 0; i < stepsLimit; i++) {
             var time = [];
             for (var j = 0; j < events.length; j++) {
@@ -321,11 +321,13 @@ class App extends Component {
                 updaterData.event.end = that.getTime(that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].start +
                     that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].duration);
                 updaterData.event.title = that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].title;
+                updaterData.event.id = e.target.getAttribute('data-event-id');
             } else {
                 setParams(e);
                 updaterData.event.start = that.getTime(createrData.top - 20);
                 updaterData.event.end = that.getTime(createrData.height + createrData.top - 20);
                 updaterData.event.title = '';
+                updaterData.event.id = null;
             }
             document.body.removeEventListener('mousemove', setParams);
             that.props.onShowEventUpdater(updaterData);
@@ -336,17 +338,16 @@ class App extends Component {
     }
 
     hideEventUpdater(e) {
-        if(e.target.className ==='event_updater'
-            || e.target.parentElement.className ==='event_updater') {
-            return;
+        if(e.target.className ==='event_updater_container' ||
+            e.target.className === 'close_button') {
+            this.props.onShowUpdater(false);
+            this.props.onShowEventUpdater();
+            this.props.onUpdateEventCreater({top: 0, height: 0});
         }
-        this.props.onShowUpdater(false);
-        this.props.onShowEventUpdater();
-        this.props.onUpdateEventCreater({top: 0, height: 0});
     }
 
     updateEventStart(e) {
-        this.props.onUpdateEventStart(e.target.value)
+        this.props.onUpdateEventStart(e)
     }
 
     updateEventTitle(e) {
@@ -354,7 +355,71 @@ class App extends Component {
     }
 
     updateEventDuration(e) {
-        this.props.onUpdateEventDuration(e.target.value)
+        this.props.onUpdateEventDuration(e)
+    }
+
+    disabledStartHours() {
+        let hour = this.props.eventList.eventUpdater.currentEvent.start._d.getHours();
+        if (hour < 12) {
+            return [0, 1, 2, 3, 4, 5, 6, 7, 12]
+        } else {
+            return [0, 6, 7, 8, 9, 10, 11]
+        }
+    }
+
+    disabledEndHours() {
+        let hour = this.props.eventList.eventUpdater.currentEvent.end._d.getHours();
+        if (hour < 12) {
+            return [0, 1, 2, 3, 4, 5, 6, 7, 12]
+        } else {
+            return [0, 6, 7, 8, 9, 10, 11]
+        }
+    }
+
+    addEvent(event) {
+        let eventId = event.id;
+        let dayStart = this.props.eventList.calendar.dayStart.getHours() * 60;
+        let eventStart = event.start._d.getHours() * 60 + event.start._d.getMinutes() - dayStart;
+        let eventEnd = event.end._d.getHours() * 60 + event.end._d.getMinutes() - dayStart;
+        let eventTitle = event.title;
+        if ((!eventStart && eventStart !== 0) || !eventEnd || (!eventId && !eventTitle)) {
+            return;
+        }
+        if (eventStart > eventEnd) {
+            let preTime = eventStart;
+            eventStart = eventEnd;
+            eventEnd = preTime;
+        }
+        let newEvent = {
+            start: eventStart,
+            duration: eventEnd - eventStart,
+            title: eventTitle
+        };
+        if (eventId && !newEvent.title) {
+            newEvent.title = this.props.eventList.calendar.events[+event.id].title;
+        }
+        let result = {
+            id: eventId,
+            event: newEvent
+        };
+        if (eventId) {
+            this.props.onUpdateEvent(result);
+        } else {
+            this.props.onAddEvent(result.event);
+        }
+        this.props.onShowUpdater(false);
+        this.props.onShowEventUpdater();
+        return;
+    }
+
+    removeEvent(event) {
+        if (event.id === null) {
+            return;
+        }
+        let eventId = +event.id;
+        this.props.onRemoveEvent(eventId);
+        this.props.onShowEventUpdater();
+        this.props.onShowUpdater(false);
     }
 
     render() {
@@ -388,6 +453,10 @@ class App extends Component {
                 updateEventStart={this.updateEventStart.bind(this)}
                 updateEventTitle={this.updateEventTitle.bind(this)}
                 updateEventDuration={this.updateEventDuration.bind(this)}
+                disabledStartHours={this.disabledStartHours.bind(this)}
+                disabledEndHours={this.disabledEndHours.bind(this)}
+                addEvent={this.addEvent.bind(this)}
+                removeEvent={this.removeEvent.bind(this)}
             />);
         }
         return (
@@ -435,6 +504,7 @@ export default connect(
                     top: 0,
                     left: 0,
                     event: {
+                        id: null,
                         start: 0,
                         duration: 0,
                         title: ''
@@ -457,6 +527,15 @@ export default connect(
         },
         onUpdateEventDuration: (data) => {
             dispatch({type: 'UPDATE_EVENT_DURATION', payload: data});
+        },
+        onUpdateEvent: (data) => {
+            dispatch({type: 'UPDATE_EVENT', payload: data});
+        },
+        onRemoveEvent: (id) => {
+            dispatch({type: 'REMOVE_EVENT', payload: id});
+        },
+        onAddEvent: (event) => {
+            dispatch({type: 'ADD_EVENT', payload: event});
         }
     })
 )(App);
