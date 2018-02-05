@@ -13,6 +13,42 @@ class App extends Component {
         this.askAutorization();
     }
 
+    submitLoginForm(data) {
+        let that = this;
+        let json = JSON.stringify(data);
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/login", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(json);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
+                that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
+            } else {
+                console.log(xhr.responseText);
+            }
+            that.props.onHideLoader(false);
+        }
+    }
+
+    submitRegistrationForm(data) {
+        let that = this;
+        let json = JSON.stringify(data)
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/registration", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(json);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
+                that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
+            } else {
+                that.props.onHideLoader(xhr.responseText === 'true');
+            }
+            that.props.onHideLoader(false);
+        }
+    }
+
     logOut() {
         this.props.onShowLoader();
         this.props.onChangeLogin('');
@@ -34,36 +70,35 @@ class App extends Component {
 
     askAutorization() {
         let that = this;
-        // let xhr = new XMLHttpRequest();
-        // xhr.open("POST", "/autorised", true); // false for synchronous request
-        // xhr.setRequestHeader("Content-type", "application/json");
-        // xhr.send();
-        // xhr.onreadystatechange = function () {
-        //     if (xhr.readyState !== 4) return;
-        //     if (xhr.status !== 200) {
-        //         console.log(xhr.responseText);
-        //     } else {
-        //         that.props.onHideLoader(xhr.responseText === 'true');
-        //     }
-        // }
-        that.props.onHideLoader(true);
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/autorised", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
+                console.log(xhr.responseText);
+            } else {
+                that.props.onHideLoader(xhr.responseText === 'true');
+            }
+        }
     }
 
     sendEventList() {
         let data = JSON.stringify(this.props.eventList.calendar.events);
         console.log(data);
-        // let xhr = new XMLHttpRequest();
-        // xhr.open("POST", "/events", true); // false for synchronous request
-        // xhr.setRequestHeader("Content-type", "application/json");
-        // xhr.send(data);
-        // xhr.onreadystatechange = function () {
-        //     if (xhr.readyState !== 4) return;
-        //     if (xhr.status !== 200) {
-        //         console.log(xhr.responseText);
-        //     } else {
-        //         console.log(xhr.responseText);
-        //     }
-        // }
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/events", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(data);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
+                console.log(xhr.responseText);
+            } else {
+                console.log(xhr.responseText);
+            }
+        }
     }
 
     changeLogin(e) {
@@ -103,50 +138,6 @@ class App extends Component {
                 this.submitLoginForm(userData);
             } else {
                 this.submitRegistrationForm(userData);
-            }
-        }
-    }
-
-    submitLoginForm(data) {
-        let that = this;
-        let json = JSON.stringify(data);
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", "/login", true); // false for synchronous request
-        xhr.setRequestHeader("Content-type", "application/json");
-        xhr.send(json);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState !== 4) return;
-            if (xhr.status !== 200) {
-                console.log(xhr.responseText);
-            } else {
-                if (xhr.responseText === 'true') {
-                    that.props.onHideLoader(xhr.responseText === 'true');
-                } else {
-                    that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
-                    that.props.onHideLoader(false);
-                }
-            }
-        }
-    }
-
-    submitRegistrationForm(data) {
-        let that = this;
-        let json = JSON.stringify(data)
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", "/registration", true); // false for synchronous request
-        xhr.setRequestHeader("Content-type", "application/json");
-        xhr.send(json);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState !== 4) return;
-            if (xhr.status !== 200) {
-                console.log(xhr.responseText);
-            } else {
-                if (xhr.responseText === 'true') {
-                    that.props.onHideLoader(xhr.responseText === 'true');
-                } else {
-                    that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
-                    that.props.onHideLoader(false);
-                }
             }
         }
     }

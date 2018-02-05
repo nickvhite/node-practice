@@ -17,7 +17,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 15778476000,
     httpOnly: true,
     secure: false 
   },
@@ -28,30 +27,26 @@ app.use(session({
 }));
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 
-app.get('*', (req, res) => {
-    if (req.session.user) {
-        res.sendFile(path.resolve(__dirname, '../client/build'));
-    } else {
-        res.sendFile(path.resolve(__dirname, '../client/build'));
-    }
-});
-
 app.post('/login', (req, res, next) => {
     if (req.session.user) {
-        res.end("user already logged in");
+        res.status(202).end("user already logged in");
         return;
     }
     return User.checkUser(req.body)
         .then(user => {
-            if(user){
-                req.session.user = {id: user._id, name: user.username};
-                res.end('true');
-            } else {
-                return res.end(error);
-            }
+            req.session.user = {id: user._id, name: user.username}
+            return Event.checkEvent(user._id)
+                .then(event => res.status(200).end(JSON.stringify(event)))
+                .catch(err => res.status(202).end(err))
         })
-        .catch(err => res.end(err))
+        .catch(err => res.status(202).end(err))
 });
+
+app.post('/events', (req, res, next) => {
+    console.log(req.session.user);
+    console.log(req.body);
+    return Event.updateEvent({user_id: req.session.user.id, events: req.body})
+})
 
 app.post('/logout', function(req, res, next) {
     if (req.session.user) {
@@ -66,13 +61,20 @@ app.post('/registration', (req, res, next) => {
         return;
     }
     User.createUser(req.body)
-        .then(data => res.end(data))
-        .catch(err => res.end(err))
+        .then(data => Event.createEventContainer({user_id: data._id}))
+            .then(data => {
+                req.session.user = {id: data._id, name: data.username};
+                res.end(data);
+            })
+            .catch(err => res.status(202).end(err))
+        .catch(err => res.status(202).end(err))
 });
 
 app.post('/autorised', (req, res) => {
     if (req.session.user) {
-        res.end('true');
+        return Event.checkEvent(user._id)
+            .then(event => res.status(200).end(JSON.stringify(event)))
+            .catch(err => res.status(202).end(err))
     } else {
         res.end('false');
     }

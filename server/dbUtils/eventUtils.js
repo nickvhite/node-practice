@@ -1,36 +1,31 @@
 import mongoose from 'mongoose';
 import '../models/event';
+import * as User from './userUtils';
 
 const Event = mongoose.model('Event');
 
-export function createEvent(data) {
-    return new Event({
-        username: data.username,
-        password: data.password
-    }).save()
-        .then(userData => Promise.resolve("User created"))
-        .catch(err => Promise.reject("User already exist"));
-}
-
 export function checkEvent(data) {
     return Event
-        .findOne({username: data.username})
-            .then(function(user){
-                if ( user.password === data.password){
-                    return Promise.resolve(user)
-                } else {
-                    return Promise.reject("Uncnown password")
-                }
-            })
-            .catch(err => Promise.reject("Uncnown user"))
+        .findOne({user_id: data})
+            .then(event => Promise.resolve(event.events))
+            .catch(err => Promise.reject("no connection to database"))
 }
 
-export function deleteEvent(data) {
-    return Event
-        .findOne({username: data.username})
-            .then(function(user){
-                user.remove();
-                return Promise.resolve("User deleted");
+export function updateEvent(data) {
+    return Event 
+        .findOne({user_id: data.user_id})
+            .then(function(event){
+                event.events.update(data.event);
             })
-            .catch(err => Promise.reject("Uncnown user"));
+            .cath(err => Promise.reject("events not updated"))
+}
+
+export function createEventContainer(data) {
+    return new Event({
+        user_id: data.user_id,
+        events: []
+    }).save()
+        .then(eventData => Promise.resolve('true'))
+        .catch(err => Promise.reject("events not create"));
+                
 }

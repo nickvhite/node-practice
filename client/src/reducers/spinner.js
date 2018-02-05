@@ -1,5 +1,5 @@
 const initialState = {
-    visible: true
+    visible: false
 };
 
 export default function spinner(state = initialState, action) {
