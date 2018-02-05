@@ -32,18 +32,14 @@ export default function eventUpdater(state = initialState, action) {
         state = Object.assign({}, state);
         return state;
     }
-    if ( action.type === 'UPDATE_EVENT_START') {
-        state.currentEvent.start = action.payload;
+    if ( action.type === 'UPDATE_EVENT_TIMES') {
+        state.currentEvent.start = action.payload.min;
+        state.currentEvent.end = action.payload.max;
         state = Object.assign({}, state);
         return state;
     }
     if ( action.type === 'UPDATE_EVENT_TITLE') {
         state.currentEvent.title = action.payload;
-        state = Object.assign({}, state);
-        return state;
-    }
-    if ( action.type === 'UPDATE_EVENT_DURATION') {
-        state.currentEvent.end = action.payload;
         state = Object.assign({}, state);
         return state;
     }

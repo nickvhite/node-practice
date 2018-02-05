@@ -6,6 +6,17 @@ class Calendar extends Component {
         let calendarData = this.props.eventList.calendar;
         return (
             <div id="calendar_container">
+                <p
+                    className="log_out"
+                    onClick={this.props.logOut}
+                >
+                    Sign Out
+                </p>
+                <div id="events_json">
+                    <p>
+                        {JSON.stringify(this.props.eventList.calendar.events)}
+                    </p>
+                </div>
                 <div id="time_list">
                     {this.props.buildTimes()}
                 </div>

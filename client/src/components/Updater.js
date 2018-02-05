@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import TimePicker from 'rc-time-picker';
-import 'rc-time-picker/assets/index.css';
+import InputRange from 'react-input-range';
+import 'react-input-range/lib/css/index.css';
 
 class Calendar extends Component {
     render() {
@@ -14,7 +14,6 @@ class Calendar extends Component {
             top: updaterData.updaterTop,
             left: updaterData.updaterLeft
         };
-        // console.log(updaterData.currentEvent.start._d > updaterData.currentEvent.end._d);
         return (
             <div id="updater_container">
                 <p
@@ -52,25 +51,13 @@ class Calendar extends Component {
                                 }}
                             ></p>
                         </div>
-                        <TimePicker
-                            className="time_input"
-                            showSecond={false}
-                            defaultValue={updaterData.currentEvent.start}
-                            format='h:mm a'
-                            onChange={this.props.updateEventStart}
-                            disabledHours={this.props.disabledStartHours}
-                            minuteStep={5}
-                            use12Hours
-                        />
-                        <TimePicker
-                            className="time_input"
-                            showSecond={false}
-                            defaultValue={updaterData.currentEvent.end}
-                            format='h:mm a'
-                            onChange={this.props.updateEventDuration}
-                            disabledHours={this.props.disabledEndHours}
-                            minuteStep={5}
-                            use12Hours
+                        <InputRange
+                            maxValue={570}
+                            minValue={0}
+                            formatLabel={value => this.props.getStringTime(value)}
+                            value={{min: updaterData.currentEvent.start, max: updaterData.currentEvent.end}}
+                            onChange={this.props.updateEventTimes}
+                            step={5}
                         />
                         <input
                             className="title_input"

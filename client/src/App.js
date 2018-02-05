@@ -5,13 +5,65 @@ import Form from './components/Form';
 import Spinner from './components/Spinner';
 import Calendar from './components/Calendar';
 import Updater from './components/Updater';
-import moment from 'moment';
 
 
 class App extends Component {
     constructor(props) {
         super(props);
         this.askAutorization();
+    }
+
+    logOut() {
+        this.props.onShowLoader();
+        this.props.onChangeLogin('');
+        this.props.onChangePassword('');
+        let that = this;
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "/logout", true); // false for synchronous request
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status !== 200) {
+                console.log(xhr.responseText);
+            } else {
+                that.props.onHideLoader(xhr.responseText === 'false');
+            }
+        }
+    }
+
+    askAutorization() {
+        let that = this;
+        // let xhr = new XMLHttpRequest();
+        // xhr.open("POST", "/autorised", true); // false for synchronous request
+        // xhr.setRequestHeader("Content-type", "application/json");
+        // xhr.send();
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState !== 4) return;
+        //     if (xhr.status !== 200) {
+        //         console.log(xhr.responseText);
+        //     } else {
+        //         that.props.onHideLoader(xhr.responseText === 'true');
+        //     }
+        // }
+        that.props.onHideLoader(true);
+    }
+
+    sendEventList() {
+        let data = JSON.stringify(this.props.eventList.calendar.events);
+        console.log(data);
+        // let xhr = new XMLHttpRequest();
+        // xhr.open("POST", "/events", true); // false for synchronous request
+        // xhr.setRequestHeader("Content-type", "application/json");
+        // xhr.send(data);
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState !== 4) return;
+        //     if (xhr.status !== 200) {
+        //         console.log(xhr.responseText);
+        //     } else {
+        //         console.log(xhr.responseText);
+        //     }
+        // }
     }
 
     changeLogin(e) {
@@ -99,42 +151,6 @@ class App extends Component {
         }
     }
 
-    logOut() {
-        this.props.onShowLoader();
-        this.props.onChangeLogin('');
-        this.props.onChangePassword('');
-        let that = this;
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", "/logout", true); // false for synchronous request
-        xhr.setRequestHeader("Content-type", "application/json");
-        xhr.send();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState !== 4) return;
-            if (xhr.status !== 200) {
-                console.log(xhr.responseText);
-            } else {
-                that.props.onHideLoader(xhr.responseText === 'false');
-            }
-        }
-    }
-
-    askAutorization() {
-        let that = this;
-        // let xhr = new XMLHttpRequest();
-        // xhr.open("POST", "/autorised", true); // false for synchronous request
-        // xhr.setRequestHeader("Content-type", "application/json");
-        // xhr.send();
-        // xhr.onreadystatechange = function () {
-        //     if (xhr.readyState !== 4) return;
-        //     if (xhr.status !== 200) {
-        //         console.log(xhr.responseText);
-        //     } else {
-        //         that.props.onHideLoader(xhr.responseText === 'true');
-        //     }
-        // }
-        that.props.onHideLoader(true);
-    }
-
     buildTimes() {
         let dayStart = this.props.eventList.calendar.dayStart.getTime(),
             dayEnd = this.props.eventList.calendar.dayEnd.getTime(),
@@ -167,16 +183,7 @@ class App extends Component {
     }
 
     normalizeEventDate(date) {
-        let min = date.getMinutes(),
-            hour = date.getHours();
-        if (hour < 10) {
-            hour = "0" + hour;
-        }
-        if (min === 0) {
-            min = "00";
-        }
-        let time = moment().hour(hour).minute(min);
-        return time;
+        return (date.getHours() * 60) + date.getMinutes();
     }
 
     getTime(time) {
@@ -184,6 +191,27 @@ class App extends Component {
         time = time * 60 * 1000;
         let newTime = new Date(startDay.getTime() + time);
         return this.normalizeEventDate(newTime);
+    }
+
+    getStringTime(time) {
+        debugger;
+        if (time === 0) {
+            time = this.props.eventList.eventUpdater.currentEvent.start;
+        } else if (time === 570) {
+            time = this.props.eventList.eventUpdater.currentEvent.end;
+        } else {
+            return time;
+        }
+        debugger;
+        let hours = Math.floor(time/60) + 8,
+            minutes = time%60,
+            timeEnd = hours < 12 ? 'AM' : 'PM',
+            resultHours = hours%12 === 0 ? 12 : hours%12,
+            resultMinutes = minutes;
+        resultHours = resultHours < 10 ? `0${resultHours}` : resultHours;
+        resultMinutes = resultMinutes < 10 ? `0${resultMinutes}` : resultMinutes;
+        let result = `${resultHours}:${resultMinutes} ${timeEnd}`;
+        return result;
     }
 
     createEvents(events) {
@@ -267,6 +295,9 @@ class App extends Component {
             leftOffSet.push(0);
         }
         collisions.forEach((period) => {
+            if (!period.length) {
+                return;
+            }
             let count = period.reduce((a, b) => {
                 return b ? a + 1 : a;
             });
@@ -317,15 +348,15 @@ class App extends Component {
                 event: {}
             };
             if (e.target.getAttribute('data-event-id')) {
-                updaterData.event.start = that.getTime(that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].start);
-                updaterData.event.end = that.getTime(that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].start +
-                    that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].duration);
+                updaterData.event.start = that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].start;
+                updaterData.event.end = that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].start +
+                    that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].duration;
                 updaterData.event.title = that.props.eventList.calendar.events[e.target.getAttribute('data-event-id')].title;
                 updaterData.event.id = e.target.getAttribute('data-event-id');
             } else {
                 setParams(e);
-                updaterData.event.start = that.getTime(createrData.top - 20);
-                updaterData.event.end = that.getTime(createrData.height + createrData.top - 20);
+                updaterData.event.start = createrData.top - 20;
+                updaterData.event.end = createrData.height + createrData.top - 20;
                 updaterData.event.title = '';
                 updaterData.event.id = null;
             }
@@ -346,8 +377,8 @@ class App extends Component {
         }
     }
 
-    updateEventStart(e) {
-        this.props.onUpdateEventStart(e)
+    updateEventTimes(e) {
+        this.props.onUpdateEventTimes(e);
     }
 
     updateEventTitle(e) {
@@ -355,40 +386,16 @@ class App extends Component {
     }
 
     updateEventDuration(e) {
-        this.props.onUpdateEventDuration(e)
-    }
-
-    disabledStartHours() {
-        let hour = this.props.eventList.eventUpdater.currentEvent.start._d.getHours();
-        if (hour < 12) {
-            return [0, 1, 2, 3, 4, 5, 6, 7, 12]
-        } else {
-            return [0, 6, 7, 8, 9, 10, 11]
-        }
-    }
-
-    disabledEndHours() {
-        let hour = this.props.eventList.eventUpdater.currentEvent.end._d.getHours();
-        if (hour < 12) {
-            return [0, 1, 2, 3, 4, 5, 6, 7, 12]
-        } else {
-            return [0, 6, 7, 8, 9, 10, 11]
-        }
+        this.props.onUpdateEventDuration(e);
     }
 
     addEvent(event) {
         let eventId = event.id;
-        let dayStart = this.props.eventList.calendar.dayStart.getHours() * 60;
-        let eventStart = event.start._d.getHours() * 60 + event.start._d.getMinutes() - dayStart;
-        let eventEnd = event.end._d.getHours() * 60 + event.end._d.getMinutes() - dayStart;
+        let eventStart = event.start;
+        let eventEnd = event.end;
         let eventTitle = event.title;
         if ((!eventStart && eventStart !== 0) || !eventEnd || (!eventId && !eventTitle)) {
             return;
-        }
-        if (eventStart > eventEnd) {
-            let preTime = eventStart;
-            eventStart = eventEnd;
-            eventEnd = preTime;
         }
         let newEvent = {
             start: eventStart,
@@ -409,6 +416,7 @@ class App extends Component {
         }
         this.props.onShowUpdater(false);
         this.props.onShowEventUpdater();
+        this.sendEventList();
         return;
     }
 
@@ -420,6 +428,7 @@ class App extends Component {
         this.props.onRemoveEvent(eventId);
         this.props.onShowEventUpdater();
         this.props.onShowUpdater(false);
+        this.sendEventList();
     }
 
     render() {
@@ -450,13 +459,12 @@ class App extends Component {
                 key="Updater"
                 hideEventUpdater={this.hideEventUpdater.bind(this)}
                 getTime={this.getTime.bind(this)}
-                updateEventStart={this.updateEventStart.bind(this)}
+                updateEventTimes={this.updateEventTimes.bind(this)}
                 updateEventTitle={this.updateEventTitle.bind(this)}
                 updateEventDuration={this.updateEventDuration.bind(this)}
-                disabledStartHours={this.disabledStartHours.bind(this)}
-                disabledEndHours={this.disabledEndHours.bind(this)}
                 addEvent={this.addEvent.bind(this)}
                 removeEvent={this.removeEvent.bind(this)}
+                getStringTime={this.getStringTime.bind(this)}
             />);
         }
         return (
@@ -519,8 +527,8 @@ export default connect(
         onUpdateEventCreater: (data) => {
             dispatch({type: 'UPDATE_EVENT_CREATER', payload: data});
         },
-        onUpdateEventStart: (data) => {
-            dispatch({type: 'UPDATE_EVENT_START', payload: data});
+        onUpdateEventTimes: (data) => {
+            dispatch({type: 'UPDATE_EVENT_TIMES', payload: data});
         },
         onUpdateEventTitle: (data) => {
             dispatch({type: 'UPDATE_EVENT_TITLE', payload: data});

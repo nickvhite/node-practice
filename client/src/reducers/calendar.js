@@ -27,7 +27,7 @@ export default function calendar(state = initialState, action) {
         return state;
     }
     if (action.type === 'REMOVE_EVENT') {
-        delete state.events[action.payload];
+        delete state.events.splice(action.payload, 1);
         state = Object.assign({}, state);
         return state;
     }
