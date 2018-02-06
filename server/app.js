@@ -43,9 +43,10 @@ app.post('/login', (req, res, next) => {
 });
 
 app.post('/events', (req, res, next) => {
-    console.log(req.session.user);
-    console.log(req.body);
-    return Event.updateEvent({user_id: req.session.user.id, events: req.body})
+    return Event
+        .updateEvent({user_id: req.session.user.id, events: req.body})
+            .then(events => res.status(200).end(JSON.stringify(events.events)))
+            .catch(err => res.status(202).end(err))
 })
 
 app.post('/logout', function(req, res, next) {
@@ -62,9 +63,9 @@ app.post('/registration', (req, res, next) => {
     }
     User.createUser(req.body)
         .then(data => Event.createEventContainer({user_id: data._id}))
-            .then(data => {
+            .then(event => {
                 req.session.user = {id: data._id, name: data.username};
-                res.end(data);
+                res.end(JSON.stringify(event));
             })
             .catch(err => res.status(202).end(err))
         .catch(err => res.status(202).end(err))
@@ -72,11 +73,11 @@ app.post('/registration', (req, res, next) => {
 
 app.post('/autorised', (req, res) => {
     if (req.session.user) {
-        return Event.checkEvent(user._id)
+        return Event.checkEvent(req.session.user.id)
             .then(event => res.status(200).end(JSON.stringify(event)))
             .catch(err => res.status(202).end(err))
     } else {
-        res.end('false');
+        res.status(202).end('false');
     }
 });
 

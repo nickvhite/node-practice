@@ -16,8 +16,13 @@ const initialState = {
 };
 
 export default function calendar(state = initialState, action) {
-    if ( action.type === 'SHOW_CALENDAR') {
+    if (action.type === 'SHOW_CALENDAR') {
         state.visible = action.payload;
+        state = Object.assign({}, state);
+        return state;
+    }
+    if (action.type === 'ENTRY_EVENTS') {
+        state.events = action.payload;
         state = Object.assign({}, state);
         return state;
     }

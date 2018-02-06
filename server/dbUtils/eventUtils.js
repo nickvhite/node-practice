@@ -13,11 +13,7 @@ export function checkEvent(data) {
 
 export function updateEvent(data) {
     return Event 
-        .findOne({user_id: data.user_id})
-            .then(function(event){
-                event.events.update(data.event);
-            })
-            .cath(err => Promise.reject("events not updated"))
+        .findOneAndUpdate({user_id: data.user_id}, {events: data.events})
 }
 
 export function createEventContainer(data) {

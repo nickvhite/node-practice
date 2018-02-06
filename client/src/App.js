@@ -24,10 +24,11 @@ class App extends Component {
             if (xhr.readyState !== 4) return;
             if (xhr.status !== 200) {
                 that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
+                that.props.onHideLoader(false);
             } else {
-                console.log(xhr.responseText);
+                that.props.onEntryEvent(JSON.parse(xhr.responseText));
+                that.props.onHideLoader(true);
             }
-            that.props.onHideLoader(false);
         }
     }
 
@@ -42,10 +43,11 @@ class App extends Component {
             if (xhr.readyState !== 4) return;
             if (xhr.status !== 200) {
                 that.props.onShowUserError({className: 'authorization_error', text: xhr.responseText});
+                that.props.onHideLoader(false);
             } else {
-                that.props.onHideLoader(xhr.responseText === 'true');
+                that.props.onEntryEvent(JSON.parse(xhr.responseText));
+                that.props.onHideLoader(true);
             }
-            that.props.onHideLoader(false);
         }
     }
 
@@ -63,7 +65,8 @@ class App extends Component {
             if (xhr.status !== 200) {
                 console.log(xhr.responseText);
             } else {
-                that.props.onHideLoader(xhr.responseText === 'false');
+                that.props.onEntryEvent([]);
+                that.props.onHideLoader(false);
             }
         }
     }
@@ -77,16 +80,17 @@ class App extends Component {
         xhr.onreadystatechange = function () {
             if (xhr.readyState !== 4) return;
             if (xhr.status !== 200) {
-                console.log(xhr.responseText);
+                that.props.onHideLoader(false);
             } else {
-                that.props.onHideLoader(xhr.responseText === 'true');
+                that.props.onEntryEvent(JSON.parse(xhr.responseText));
+                that.props.onHideLoader(true);
             }
         }
     }
 
     sendEventList() {
+        let that = this;
         let data = JSON.stringify(this.props.eventList.calendar.events);
-        console.log(data);
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "/events", true); // false for synchronous request
         xhr.setRequestHeader("Content-type", "application/json");
@@ -471,6 +475,9 @@ export default connect(
         eventList: state
     }),
     dispatch => ({
+        onEntryEvent: (data) => {
+            dispatch({type: 'ENTRY_EVENTS', payload: data});
+        },
         onChangeLogin: (data) => {
             dispatch({type: 'CHANGE_LOGIN', payload: data});
         },
