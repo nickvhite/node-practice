@@ -34,7 +34,7 @@ app.post('/login', (req, res, next) => {
     }
     return User.checkUser(req.body)
         .then(user => {
-            req.session.user = {id: user._id, name: user.username}
+            req.session.user = {id: user._id}
             return Event.checkEvent(user._id)
                 .then(event => res.status(200).end(JSON.stringify(event)))
                 .catch(err => res.status(202).end(err))
@@ -52,20 +52,22 @@ app.post('/events', (req, res, next) => {
 app.post('/logout', function(req, res, next) {
     if (req.session.user) {
         delete req.session.user;
-        res.end('true');
+        res.status(200).end('true');
     }
 });
 
-app.post('/registration', (req, res, next) => {
+app.post('/registration', (req, res) => {
     if (req.session.user) { 
         res.end("logged user can`t register");
         return;
     }
     User.createUser(req.body)
-        .then(data => Event.createEventContainer({user_id: data._id}))
+        .then(data => {
+                req.session.user = {id: data._id};
+                return Event.createEventContainer({user_id: data._id})
+            })
             .then(event => {
-                req.session.user = {id: data._id, name: data.username};
-                res.end(JSON.stringify(event));
+                res.status(200).end(JSON.stringify(event.events));
             })
             .catch(err => res.status(202).end(err))
         .catch(err => res.status(202).end(err))

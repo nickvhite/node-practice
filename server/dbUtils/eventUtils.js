@@ -21,7 +21,7 @@ export function createEventContainer(data) {
         user_id: data.user_id,
         events: []
     }).save()
-        .then(eventData => Promise.resolve('true'))
+        .then(eventData => Promise.resolve(eventData))
         .catch(err => Promise.reject("events not create"));
                 
 }

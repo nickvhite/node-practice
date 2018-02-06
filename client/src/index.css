@@ -34,7 +34,7 @@ body {
 }
 .start_form .calendar_logo .calendar_logo_week_day {
   height: 30px;
-  background: #de5151;
+  background: #6E9ECF;
   margin: 0;
   line-height: 30px;
   text-align: center;
@@ -75,7 +75,7 @@ body {
   text-align: center;
   background: #de515136;
   border-radius: 5px;
-  margin-top: -5px;
+  margin-top: -55px;
 }
 form input {
   margin: 10px 0;
@@ -119,10 +119,10 @@ form button {
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
   outline: 0;
   border: none;
-  background: #de5151;
+  background: #6E9ECF;
   cursor: pointer;
   border-radius: 3px;
-  padding: 6px;
+  padding: 15px;
   color: #fff;
   margin: 25px 0 0;
   box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2);
@@ -211,7 +211,7 @@ form .form_border span {
   border-left: 5px solid #cbcbca;
   border-right: 5px solid #cbcbca;
   border-bottom: 5px solid #cbcbca;
-  border-top: 5px solid #de5151;
+  border-top: 5px solid #6E9ECF;
   border-radius: 100%;
   height: 100px;
   width: 100px;

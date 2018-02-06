@@ -10,7 +10,7 @@ export function createUser(data) {
         password: data.password
     }).save()
         .then(userData => Promise.resolve(userData))
-        .catch(err => Promise.reject("Username not unique"));
+        .catch(err => Promise.reject("Username not unique"))
 }
 
 export function checkUser(data) {
